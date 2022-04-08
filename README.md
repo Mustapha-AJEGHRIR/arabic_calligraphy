@@ -2,9 +2,9 @@
 
 
 ## Calliar
-Import the calliar repository into your project.
+Import the calliar repository into your project, by executing the bash script as follows :
 
 ```
-$ git submodule init
-$ git submodule update
+$ bash get_calliar.sh
 ```
+The script initialises the git submodules, updates it. Then extracts the dataset.
