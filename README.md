@@ -27,6 +27,9 @@ Fonts: (40)
 
 ### ADAB (handwritten arabic)
 
-<https://ieee-dataport.org/open-access/adab-database#files>
+Execute the bash script as follows :
 
-download link: <https://github.com/kourgeorge/arabic-icr/tree/master/Data/Databases>
+```bash
+$ cd data
+$ bash get_adab_dataset.sh    
+```
