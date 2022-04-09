@@ -13,7 +13,7 @@ import os
 data_path = "../data/calliar/chars/"
 images = glob.glob(os.path.join(data_path, '*'))[:3000]
 df = pd.DataFrame(images, columns=["file_name"])
-df['text'] = df['file_name'].apply(lambda x: x.split("/")[-1].split("\uf03a")[-1][:-4]) # ":"
+df['text'] = df['file_name'].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4]) # ":" or "\uf03a"
 df
 
 # %%
@@ -117,8 +117,8 @@ from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
     fp16=True, 
     output_dir="./",
     logging_steps=2,
@@ -126,6 +126,7 @@ training_args = Seq2SeqTrainingArguments(
     save_total_limit=1,
     eval_steps=10,
     num_train_epochs=1000,
+    report_to="wandb",
 )
 
 # %%
