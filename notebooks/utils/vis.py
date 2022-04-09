@@ -14,7 +14,7 @@ import glob
 import os 
 import re
 import svgwrite
-from chars import map_chars 
+from .chars import map_chars 
 
 def get_bounds(data):
     minx, miny = 600, 600  
@@ -193,7 +193,7 @@ def concatenate(images, mode='h', margin=10):
 
 def generate_characters(file):
     char_drawings = []
-    annot = file.split('/')[-1][:-5]
+    annot = get_annotation(file)
     char_comps = preprocess(annot)
     drawing = json.load(open(file))
     new_drawing = apply_rdb(drawing, verbose = 0)
