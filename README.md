@@ -7,7 +7,7 @@
 Import the calliar repository into your project, by executing the bash script as follows :
 
 ```
-bash get_calliar.sh
+$ bash get_calliar.sh
 ```
 
 The script initialises the git submodules, updates it. Then extracts the dataset.
@@ -16,8 +16,13 @@ The script initialises the git submodules, updates it. Then extracts the dataset
 
 Fonts: Aref Ruqaa - Iran Nastaliq
 <https://paperswithcode.com/dataset/rufa>
-
 <https://mhmoodlan.github.io/blog/arabic-font-classification>
+To get the data, execute the bash script as follows :
+
+```bash
+$ cd data
+$ get_rufa_dataset.sh
+```
 
 ### KAFD (Font recognition)
 
