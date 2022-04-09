@@ -61,7 +61,7 @@ class IAMDataset(Dataset):
 # %%
 from transformers import TrOCRProcessor
 
-# processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
 train_dataset = IAMDataset(root_dir=data_path,
                            df=train_df,
                            processor=processor)
