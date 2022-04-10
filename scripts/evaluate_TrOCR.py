@@ -47,8 +47,8 @@ class IAMDataset(Dataset):
 # %%
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 
-processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-# processor = TrOCRProcessor.from_pretrained("./checkpoint-16000", local_files_only=True)
+# processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+processor = TrOCRProcessor.from_pretrained("./checkpoint-2000", local_files_only=True)
 test_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
 
 # %%
@@ -70,7 +70,7 @@ print(label_str)
 from transformers import VisionEncoderDecoderModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-16000", local_files_only=True)
+model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-2000", local_files_only=True)
 model.to(device)
 
 # %%

@@ -71,7 +71,7 @@ feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16
 # arabert_prep = ArabertPreprocessor(model_name=model_name)
 # from transformers import RobertaTokenizer, XLMRobertaTokenizer
 
-# tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic")
+# tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic") #TODO: https://github.com/huggingface/transformers/issues/2185
 processor = TrOCRProcessor(feature_extractor, tokenizer)
 train_dataset = IAMDataset(root_dir=data_path, df=train_df, processor=processor)
 eval_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
@@ -115,7 +115,7 @@ model.config.vocab_size = model.config.decoder.vocab_size
 # set decoder config to causal lm (only required in case one initializes the decoder with the weights of an encoder-only model)
 # this will add the randomly initialized cross-attention layers
 # model.config.decoder.is_decoder = True
-# model.config.decoder.add_cross_attention = True
+# model.config.decoder.add_cross_attention = True # https://github.com/huggingface/transformers/issues/14195
 
 # set beam search parameters
 model.config.eos_token_id = processor.tokenizer.sep_token_id
