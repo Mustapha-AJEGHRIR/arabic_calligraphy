@@ -20,8 +20,8 @@ df
 # %%
 from sklearn.model_selection import train_test_split
 
-train_df, test_df = train_test_split(df, test_size=0.1)
-train_df, test_df = train_df[:2000], test_df[:10]
+train_df, test_df = train_test_split(df, test_size=100)
+# train_df, test_df = train_df[:], test_df[:100]
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
 print(f"train_df: {train_df.shape}")
@@ -114,15 +114,15 @@ from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
-    per_device_train_batch_size=16,
-    per_device_eval_batch_size=16,
+    per_device_train_batch_size=64,
+    per_device_eval_batch_size=32,
     fp16=True,
     output_dir="./",
-    logging_steps=1,
-    save_steps=1,
+    logging_steps=2,
+    save_steps=500,
     save_total_limit=1,
-    eval_steps=1,
-    num_train_epochs=1,
+    eval_steps=10,
+    num_train_epochs=5,
     report_to="wandb",
 )
 
