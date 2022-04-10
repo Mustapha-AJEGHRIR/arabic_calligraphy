@@ -124,14 +124,24 @@ for batch in tqdm(test_dataloader):
 
     # decode
     pred_str = processor.batch_decode(outputs, skip_special_tokens=True)
-    print("pred_str:", pred_str)
+    # print("pred_str:", pred_str)
     labels = batch["labels"]
     labels[labels == -100] = processor.tokenizer.pad_token_id
     label_str = processor.batch_decode(labels, skip_special_tokens=True)
+    # remove empty strings
+    for i in range(len(label_str) - 1, -1, -1):
+        if len(label_str[i]) == 0:
+            label_str.pop(i)
+            pred_str.pop(i)
+    # add batch to metric
     label_true.extend(label_str)
     label_pred.extend(pred_str)
-    # add batch to metric
     cer.add_batch(predictions=pred_str, references=label_str)
+
+
+# save label_true and label_pred as csv
+df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
+df.to_csv("label_true_pred.csv", index=False)
 
 final_score = cer.compute()
 print("Character error rate on test set:", final_score)
@@ -139,22 +149,23 @@ print("Character error rate on test set:", final_score)
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
-plt.rcParams["figure.figsize"] = (10, 10)
+
+# make results folder
+if not os.path.exists("results"):
+    os.mkdir("results")
+plt.rcParams["figure.figsize"] = (15, 15)
 # get unique labels
 labels = list(set(label_true))
 print(f"labels {len(labels)}: {labels}")
-ConfusionMatrixDisplay.from_predictions(label_true, label_pred, labels=labels)
-plt.savefig("confusion_matrix.png")
+ConfusionMatrixDisplay.from_predictions(label_true, label_pred, labels=labels, cmap=plt.cm.Blues)
+plt.savefig("results/confusion_matrix.png")
 
 # classification report
 from sklearn.metrics import classification_report
 
 print(classification_report(label_true, label_pred, labels=labels, target_names=labels))
 # save report
-with open("classification_report.txt", "w") as f:
+with open("results/classification_report.txt", "w") as f:
     f.write(classification_report(label_true, label_pred, labels=labels, target_names=labels))
 
 #%%
-# save label_true and label_pred as csv
-df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
-df.to_csv("label_true_pred.csv", index=False)
