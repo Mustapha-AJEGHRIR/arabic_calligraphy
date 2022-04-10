@@ -20,7 +20,7 @@ df
 # %%
 from sklearn.model_selection import train_test_split
 
-train_df, test_df = train_test_split(df, test_size=128)
+train_df, test_df = train_test_split(df, test_size=32)
 # train_df, test_df = train_df[:], test_df[:100]
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
@@ -127,15 +127,15 @@ from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
-    per_device_train_batch_size=32,
-    per_device_eval_batch_size=32,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
     fp16=True,
     output_dir="./",
     logging_steps=1,
     save_steps=500,
-    save_total_limit=3,
-    eval_steps=5,
-    num_train_epochs=5,
+    save_total_limit=1,
+    eval_steps=1,
+    num_train_epochs=100,
     report_to="wandb",
 )
 # %%
@@ -158,7 +158,6 @@ def compute_metrics(pred):
 
 # %%
 from transformers import default_data_collator
-from transformers import EarlyStoppingCallback
 
 # instantiate trainer
 trainer = Seq2SeqTrainer(
@@ -169,7 +168,6 @@ trainer = Seq2SeqTrainer(
     train_dataset=eval_dataset,
     eval_dataset=eval_dataset,
     data_collator=default_data_collator,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
 )
 trainer.train()
 

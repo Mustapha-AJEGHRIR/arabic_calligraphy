@@ -40,7 +40,6 @@ class IAMDataset(Dataset):
         labels = self.processor.tokenizer(text, padding="max_length", max_length=self.max_target_length).input_ids
         # important: make sure that PAD tokens are ignored by the loss function
         labels = [label if label != self.processor.tokenizer.pad_token_id else -100 for label in labels]
-
         encoding = {"pixel_values": pixel_values.squeeze(), "labels": torch.tensor(labels)}
         return encoding
 
@@ -71,7 +70,7 @@ print(label_str)
 from transformers import VisionEncoderDecoderModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-2", local_files_only=True)
+model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-16000", local_files_only=True)
 model.to(device)
 
 # %%
@@ -109,6 +108,7 @@ for batch in tqdm(test_dataloader):
 
     # decode
     pred_str = processor.batch_decode(outputs, skip_special_tokens=True)
+    print("pred_str:", pred_str)
     labels = batch["labels"]
     labels[labels == -100] = processor.tokenizer.pad_token_id
     label_str = processor.batch_decode(labels, skip_special_tokens=True)
@@ -120,14 +120,21 @@ for batch in tqdm(test_dataloader):
 final_score = cer.compute()
 print("Character error rate on test set:", final_score)
 # %%
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
+plt.rcParams["figure.figsize"] = (10, 10)
 # get unique labels
 labels = list(set(label_true))
-print(f"labels: {labels}")
-cm = confusion_matrix(label_true, label_pred, labels=labels)
-print(cm)
+print(f"labels {len(labels)}: {labels}")
+ConfusionMatrixDisplay.from_predictions(label_true, label_pred, labels=labels)
 
+# classification report
+from sklearn.metrics import classification_report
+
+print(classification_report(label_true, label_pred, labels=labels, target_names=labels))
+
+#%%
 # save label_true and label_pred as csv
 df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
 df.to_csv("label_true_pred.csv", index=False)
