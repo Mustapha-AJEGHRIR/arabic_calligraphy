@@ -174,7 +174,7 @@ trainer = Seq2SeqTrainer(
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
     data_collator=default_data_collator,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=250)],
 )
 trainer.train()
 
