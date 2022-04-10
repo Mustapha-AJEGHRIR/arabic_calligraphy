@@ -7,7 +7,6 @@ data_path = "../data/calliar/chars/"
 images = glob.glob(os.path.join(data_path, "*"))[:5000]
 df = pd.DataFrame(images, columns=["file_name"])
 df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
-df = df[df["text"].apply(lambda x: len(x) > 0)]
 df
 
 # %%
@@ -132,7 +131,7 @@ for batch in tqdm(test_dataloader):
     label_true.extend(label_str)
     label_pred.extend(pred_str)
     # remove empty strings
-    for i in range(len(label_true)):
+    for i in range(len(label_true), 0, -1):
         if len(label_true[i]) == 0:
             label_true.pop(i)
             label_pred.pop(i)
