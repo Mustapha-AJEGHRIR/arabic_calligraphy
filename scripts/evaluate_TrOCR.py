@@ -4,7 +4,7 @@ import glob
 import os
 
 data_path = "../data/calliar/chars/"
-images = glob.glob(os.path.join(data_path, "*"))[:100]
+images = glob.glob(os.path.join(data_path, "*"))[:5000]
 df = pd.DataFrame(images, columns=["file_name"])
 df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
 df
@@ -45,10 +45,26 @@ class IAMDataset(Dataset):
 
 
 # %%
-from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+# from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+# processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+# processor = TrOCRProcessor.from_pretrained("./checkpoint-2000", local_files_only=True)
+
+
+from transformers import TrOCRProcessor
 
 processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-# processor = TrOCRProcessor.from_pretrained("./checkpoint-16000", local_files_only=True)
+tokenizer = processor.tokenizer
+from transformers import ViTFeatureExtractor
+
+feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
+# from arabert.preprocess import ArabertPreprocessor
+# arabert_prep = ArabertPreprocessor(model_name=model_name)
+# from transformers import RobertaTokenizer, XLMRobertaTokenizer
+
+# tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic") #TODO: https://github.com/huggingface/transformers/issues/2185
+processor = TrOCRProcessor(feature_extractor, tokenizer)
+
+
 test_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
 
 # %%
@@ -70,7 +86,7 @@ print(label_str)
 from transformers import VisionEncoderDecoderModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-16000", local_files_only=True)
+model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-2000", local_files_only=True)
 model.to(device)
 
 # %%
@@ -128,11 +144,15 @@ plt.rcParams["figure.figsize"] = (10, 10)
 labels = list(set(label_true))
 print(f"labels {len(labels)}: {labels}")
 ConfusionMatrixDisplay.from_predictions(label_true, label_pred, labels=labels)
+plt.savefig("confusion_matrix.png")
 
 # classification report
 from sklearn.metrics import classification_report
 
 print(classification_report(label_true, label_pred, labels=labels, target_names=labels))
+# save report
+with open("classification_report.txt", "w") as f:
+    f.write(classification_report(label_true, label_pred, labels=labels, target_names=labels))
 
 #%%
 # save label_true and label_pred as csv

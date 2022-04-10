@@ -20,7 +20,7 @@ df
 # %%
 from sklearn.model_selection import train_test_split
 
-train_df, test_df = train_test_split(df, test_size=128)
+train_df, test_df = train_test_split(df, test_size=8 * 4, random_state=42)
 # train_df, test_df = train_df[:], test_df[:100]
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
@@ -62,16 +62,16 @@ class IAMDataset(Dataset):
 # %%
 from transformers import TrOCRProcessor
 
-# processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-
+processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+tokenizer = processor.tokenizer
 from transformers import ViTFeatureExtractor
 
 feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
 # from arabert.preprocess import ArabertPreprocessor
 # arabert_prep = ArabertPreprocessor(model_name=model_name)
-from transformers import RobertaTokenizer, XLMRobertaTokenizer
+# from transformers import RobertaTokenizer, XLMRobertaTokenizer
 
-tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic")
+# tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic") #TODO: https://github.com/huggingface/transformers/issues/2185
 processor = TrOCRProcessor(feature_extractor, tokenizer)
 train_dataset = IAMDataset(root_dir=data_path, df=train_df, processor=processor)
 eval_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
@@ -112,6 +112,10 @@ model.config.decoder_start_token_id = processor.tokenizer.cls_token_id
 model.config.pad_token_id = processor.tokenizer.pad_token_id
 # make sure vocab size is set correctly
 model.config.vocab_size = model.config.decoder.vocab_size
+# set decoder config to causal lm (only required in case one initializes the decoder with the weights of an encoder-only model)
+# this will add the randomly initialized cross-attention layers
+# model.config.decoder.is_decoder = True
+# model.config.decoder.add_cross_attention = True # https://github.com/huggingface/transformers/issues/14195
 
 # set beam search parameters
 model.config.eos_token_id = processor.tokenizer.sep_token_id
@@ -127,15 +131,15 @@ from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
-    per_device_train_batch_size=32,
-    per_device_eval_batch_size=32,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
     fp16=True,
     output_dir="./",
     logging_steps=1,
     save_steps=500,
     save_total_limit=3,
     eval_steps=5,
-    num_train_epochs=5,
+    num_train_epochs=500,
     report_to="wandb",
     load_best_model_at_end=True,  # must be true for early stopping
 )
