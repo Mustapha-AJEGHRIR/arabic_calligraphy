@@ -1,5 +1,6 @@
 
 # %%
+from cProfile import label
 import gradio as gr
 import numpy as np
 # import random as rn
@@ -7,8 +8,11 @@ import numpy as np
 import tensorflow as tf
 import cv2
 
-# tf.config.experimental.set_visible_devices([], 'GPU')
+tf.config.experimental.set_visible_devices([], 'GPU')
 
+#%% constantes
+COLOR = np.array([163, 23, 252])/255.0
+ALPHA = 0.8
 
 #%%
 def parse_image(image):
@@ -54,24 +58,65 @@ model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=False), optimi
 model.load_weights('weights.h5')
 
 #%%
+
+def saliency_map(img):
+    """
+    return the normalized gradients overs the image, and also the prediction of the model
+    """
+    inp = tf.convert_to_tensor(
+        img[None, :, :, None],
+        dtype = tf.float32
+    )
+    inp_var = tf.Variable(inp)
+
+    with tf.GradientTape() as tape:
+        pred = model(inp_var, training=False)
+        loss = pred[0][0]
+    grads = tape.gradient(loss, inp_var)
+    grads = tf.math.abs(grads) / (tf.math.reduce_max(tf.math.abs(grads))+1e-14)
+    return grads, round(float(model(inp_var, training = False)))
+
+#%%
 def segment(image):
+    # c = image
+    print(image.shape)
     image = parse_image(image)
-    # print(image.shape)
+    print(image.shape)
     output = model.predict(image)
     # print(output)
     labels = {
-        "farsi" : 1-float(output),
-        "ruqaa" : float(output)
+        "Farsi" : 1-float(output),
+        "Ruqaa" : float(output)
     }
-    return labels
+    grads, _ = saliency_map(image[0, :, :, 0])
+    s_map = grads.numpy()[0, :, :, 0]
+    reconstructed_image = cv2.cvtColor(image.squeeze(0), cv2.COLOR_GRAY2RGB)
+    for i in range(reconstructed_image.shape[0]):
+        for j in range(reconstructed_image.shape[1]):
+            reconstructed_image[i, j, :] = reconstructed_image[i, j, :] * (1-ALPHA) + s_map[i, j]* COLOR * ALPHA
+    # reconstructed_image = reconstructed_image.astype(np.uint8)
+    V = reconstructed_image
+    # print("i shape:", i.shape)
+    # print("type(i):", type(i))
+    return labels, reconstructed_image
 
 iface = gr.Interface(fn=segment, 
+                    description="""
+                    This is an Arab Calligraphy Style Recognition. 
+                    This model predicts the style (binary classification) of the image. 
+                    The model also outputs the Saliency map.
+                    """,
                     inputs="image", 
-                    outputs="label",
+                    outputs=[
+                        gr.outputs.Label(num_top_classes=2, label="Style"), 
+                        gr.outputs.Image(label = "Saliency map")
+                    ],
                     examples=[["images/Farsi_1.jpg"], 
                               ["images/Farsi_2.jpg"],
+                              ["images/real_Farsi.jpg"],
                               ["images/Ruqaa_1.jpg"],
                               ["images/Ruqaa_2.jpg"],
                               ["images/Ruqaa_3.jpg"],
+                              ["images/real_Ruqaa.jpg"],
                     ]).launch()
 # %%
