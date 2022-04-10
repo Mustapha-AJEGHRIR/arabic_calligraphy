@@ -1,3 +1,14 @@
+---
+title: Arabic Calligraphy style recognition
+emoji: a
+colorFrom: #ff0000
+colorTo: #440000
+sdk: gradio
+sdk_version: 2.9.1
+app_file: app.py
+pinned: true
+---
+
 The weights of the model aren't here, download them first and put them in the same directory as `acsr.py`
 
 ```bash
