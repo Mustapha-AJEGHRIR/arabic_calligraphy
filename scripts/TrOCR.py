@@ -139,7 +139,7 @@ training_args = Seq2SeqTrainingArguments(
     save_steps=500,
     save_total_limit=3,
     eval_steps=5,
-    num_train_epochs=5,
+    num_train_epochs=500,
     report_to="wandb",
     load_best_model_at_end=True,  # must be true for early stopping
 )
