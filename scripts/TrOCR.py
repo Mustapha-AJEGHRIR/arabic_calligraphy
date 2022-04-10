@@ -20,7 +20,7 @@ df
 # %%
 from sklearn.model_selection import train_test_split
 
-train_df, test_df = train_test_split(df, test_size=100)
+train_df, test_df = train_test_split(df, test_size=32)
 # train_df, test_df = train_df[:], test_df[:100]
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
@@ -62,7 +62,17 @@ class IAMDataset(Dataset):
 # %%
 from transformers import TrOCRProcessor
 
-processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+# processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+
+from transformers import ViTFeatureExtractor
+
+feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
+# from arabert.preprocess import ArabertPreprocessor
+# arabert_prep = ArabertPreprocessor(model_name=model_name)
+from transformers import RobertaTokenizer, XLMRobertaTokenizer
+
+tokenizer = XLMRobertaTokenizer.from_pretrained("symanto/sn-xlm-roberta-base-snli-mnli-anli-xnli")
+processor = TrOCRProcessor(feature_extractor, tokenizer)
 train_dataset = IAMDataset(root_dir=data_path, df=train_df, processor=processor)
 eval_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
 
@@ -91,7 +101,10 @@ print("label_str", label_str)
 # %%
 from transformers import VisionEncoderDecoderModel
 
-model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-stage1")
+# model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-stage1")
+model = VisionEncoderDecoderModel.from_encoder_decoder_pretrained(
+    "google/vit-base-patch16-224-in21k", "aubmindlab/bert-base-arabertv2"
+)
 
 # %%
 # set special tokens used for creating the decoder_input_ids from the labels
@@ -118,11 +131,11 @@ training_args = Seq2SeqTrainingArguments(
     per_device_eval_batch_size=16,
     fp16=True,
     output_dir="./",
-    logging_steps=2,
+    logging_steps=1,
     save_steps=500,
     save_total_limit=1,
-    eval_steps=10,
-    num_train_epochs=5,
+    eval_steps=1,
+    num_train_epochs=100,
     report_to="wandb",
 )
 
@@ -153,10 +166,12 @@ trainer = Seq2SeqTrainer(
     tokenizer=processor.feature_extractor,
     args=training_args,
     compute_metrics=compute_metrics,
-    train_dataset=train_dataset,
+    train_dataset=eval_dataset,
     eval_dataset=eval_dataset,
     data_collator=default_data_collator,
 )
 trainer.train()
+
+trainer.save_model()
 
 # %%
