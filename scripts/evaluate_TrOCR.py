@@ -127,3 +127,7 @@ labels = list(set(label_true))
 print(f"labels: {labels}")
 cm = confusion_matrix(label_true, label_pred, labels=labels)
 print(cm)
+
+# save label_true and label_pred as csv
+df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
+df.to_csv("label_true_pred.csv", index=False)
