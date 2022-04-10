@@ -112,6 +112,10 @@ model.config.decoder_start_token_id = processor.tokenizer.cls_token_id
 model.config.pad_token_id = processor.tokenizer.pad_token_id
 # make sure vocab size is set correctly
 model.config.vocab_size = model.config.decoder.vocab_size
+# set decoder config to causal lm (only required in case one initializes the decoder with the weights of an encoder-only model)
+# this will add the randomly initialized cross-attention layers
+model.config.decoder.is_decoder = True
+model.config.decoder.add_cross_attention = True
 
 # set beam search parameters
 model.config.eos_token_id = processor.tokenizer.sep_token_id
@@ -167,10 +171,10 @@ trainer = Seq2SeqTrainer(
     tokenizer=processor.feature_extractor,
     args=training_args,
     compute_metrics=compute_metrics,
-    train_dataset=train_dataset,
+    train_dataset=eval_dataset,
     eval_dataset=eval_dataset,
     data_collator=default_data_collator,
-    # callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
+    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
 )
 trainer.train()
 
