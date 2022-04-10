@@ -11,7 +11,7 @@ import pandas as pd
 import glob
 import os
 
-data_path = "../data/calliar/chars/"
+data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../data/calliar/chars/")
 images = glob.glob(os.path.join(data_path, "*"))
 df = pd.DataFrame(images, columns=["file_name"])
 df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
@@ -138,7 +138,6 @@ training_args = Seq2SeqTrainingArguments(
     num_train_epochs=100,
     report_to="wandb",
 )
-
 # %%
 from datasets import load_metric
 
