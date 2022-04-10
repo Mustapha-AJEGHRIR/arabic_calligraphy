@@ -1,3 +1,6 @@
 cairosvg
 svgwrite
 rdp
+jiwer
+datasets
+sentencepiece
