@@ -12,7 +12,7 @@ import glob
 import os
 
 data_path = "../data/calliar/chars/"
-images = glob.glob(os.path.join(data_path, "*"))[:32]
+images = glob.glob(os.path.join(data_path, "*"))
 df = pd.DataFrame(images, columns=["file_name"])
 df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
 df
