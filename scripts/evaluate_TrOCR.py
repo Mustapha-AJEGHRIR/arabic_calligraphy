@@ -131,7 +131,7 @@ for batch in tqdm(test_dataloader):
     label_true.extend(label_str)
     label_pred.extend(pred_str)
     # remove empty strings
-    for i in range(len(label_true), 0, -1):
+    for i in range(len(label_true) - 1, -1, -1):
         if len(label_true[i]) == 0:
             label_true.pop(i)
             label_pred.pop(i)
