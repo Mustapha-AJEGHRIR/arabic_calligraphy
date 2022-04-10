@@ -114,7 +114,7 @@ from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
-    per_device_train_batch_size=64,
+    per_device_train_batch_size=32,
     per_device_eval_batch_size=32,
     fp16=True,
     output_dir="./",
