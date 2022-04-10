@@ -20,7 +20,7 @@ df
 # %%
 from sklearn.model_selection import train_test_split
 
-train_df, test_df = train_test_split(df, test_size=128)
+train_df, test_df = train_test_split(df, test_size=128, random_state=42)
 # train_df, test_df = train_df[:], test_df[:100]
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
@@ -62,16 +62,16 @@ class IAMDataset(Dataset):
 # %%
 from transformers import TrOCRProcessor
 
-# processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-
+processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+tokenizer = processor.tokenizer
 from transformers import ViTFeatureExtractor
 
 feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
 # from arabert.preprocess import ArabertPreprocessor
 # arabert_prep = ArabertPreprocessor(model_name=model_name)
-from transformers import RobertaTokenizer, XLMRobertaTokenizer
+# from transformers import RobertaTokenizer, XLMRobertaTokenizer
 
-tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic")
+# tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic")
 processor = TrOCRProcessor(feature_extractor, tokenizer)
 train_dataset = IAMDataset(root_dir=data_path, df=train_df, processor=processor)
 eval_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
