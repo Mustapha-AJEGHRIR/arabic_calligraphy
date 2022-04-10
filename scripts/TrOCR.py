@@ -137,6 +137,7 @@ training_args = Seq2SeqTrainingArguments(
     eval_steps=5,
     num_train_epochs=5,
     report_to="wandb",
+    load_best_model_at_end=True,  # must be true for early stopping
 )
 # %%
 from datasets import load_metric
