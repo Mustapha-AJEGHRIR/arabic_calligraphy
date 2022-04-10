@@ -71,7 +71,7 @@ feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16
 # arabert_prep = ArabertPreprocessor(model_name=model_name)
 from transformers import RobertaTokenizer, XLMRobertaTokenizer
 
-tokenizer = XLMRobertaTokenizer.from_pretrained("symanto/sn-xlm-roberta-base-snli-mnli-anli-xnli")
+tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic")
 processor = TrOCRProcessor(feature_extractor, tokenizer)
 train_dataset = IAMDataset(root_dir=data_path, df=train_df, processor=processor)
 eval_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
@@ -128,7 +128,7 @@ training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
     per_device_train_batch_size=32,
-    per_device_eval_batch_size=16,
+    per_device_eval_batch_size=32,
     fp16=True,
     output_dir="./",
     logging_steps=1,
