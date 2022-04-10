@@ -20,7 +20,7 @@ df
 # %%
 from sklearn.model_selection import train_test_split
 
-train_df, test_df = train_test_split(df, test_size=128, random_state=42)
+train_df, test_df = train_test_split(df, test_size=8 * 4, random_state=42)
 # train_df, test_df = train_df[:], test_df[:100]
 train_df.reset_index(drop=True, inplace=True)
 test_df.reset_index(drop=True, inplace=True)
@@ -114,8 +114,8 @@ model.config.pad_token_id = processor.tokenizer.pad_token_id
 model.config.vocab_size = model.config.decoder.vocab_size
 # set decoder config to causal lm (only required in case one initializes the decoder with the weights of an encoder-only model)
 # this will add the randomly initialized cross-attention layers
-model.config.decoder.is_decoder = True
-model.config.decoder.add_cross_attention = True
+# model.config.decoder.is_decoder = True
+# model.config.decoder.add_cross_attention = True
 
 # set beam search parameters
 model.config.eos_token_id = processor.tokenizer.sep_token_id
@@ -132,7 +132,7 @@ training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
     evaluation_strategy="steps",
     per_device_train_batch_size=16,
-    per_device_eval_batch_size=16,
+    per_device_eval_batch_size=8,
     fp16=True,
     output_dir="./",
     logging_steps=1,
