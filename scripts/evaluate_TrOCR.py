@@ -7,6 +7,7 @@ data_path = "../data/calliar/chars/"
 images = glob.glob(os.path.join(data_path, "*"))[:5000]
 df = pd.DataFrame(images, columns=["file_name"])
 df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
+df = df[df["text"].apply(lambda x: len(x) > 0)]
 df
 
 # %%
@@ -124,7 +125,7 @@ for batch in tqdm(test_dataloader):
 
     # decode
     pred_str = processor.batch_decode(outputs, skip_special_tokens=True)
-    print("pred_str:", pred_str)
+    # print("pred_str:", pred_str)
     labels = batch["labels"]
     labels[labels == -100] = processor.tokenizer.pad_token_id
     label_str = processor.batch_decode(labels, skip_special_tokens=True)
