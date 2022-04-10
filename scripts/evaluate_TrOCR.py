@@ -131,8 +131,18 @@ for batch in tqdm(test_dataloader):
     label_str = processor.batch_decode(labels, skip_special_tokens=True)
     label_true.extend(label_str)
     label_pred.extend(pred_str)
+    # remove empty strings
+    for i in range(len(label_true)):
+        if len(label_true[i]) == 0:
+            label_true.pop(i)
+            label_pred.pop(i)
     # add batch to metric
     cer.add_batch(predictions=pred_str, references=label_str)
+
+
+# save label_true and label_pred as csv
+df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
+df.to_csv("label_true_pred.csv", index=False)
 
 final_score = cer.compute()
 print("Character error rate on test set:", final_score)
@@ -156,6 +166,3 @@ with open("classification_report.txt", "w") as f:
     f.write(classification_report(label_true, label_pred, labels=labels, target_names=labels))
 
 #%%
-# save label_true and label_pred as csv
-df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
-df.to_csv("label_true_pred.csv", index=False)
