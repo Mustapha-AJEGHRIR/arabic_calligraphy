@@ -82,13 +82,12 @@ def draw_words(json_path, plot=False, save_folder="../data/calliar/words/", stro
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
     word_drawings = generate_words(json_path)
-    print(json_path)
-    # print(word_drawings)
+    # print(json_path)
     for i, d in enumerate(word_drawings):
         word, drawing = list(d.items())[0]
         save_path = json_path.split("/")[-1][:-5] + f"_{i}:{word}.png"
-        # if save_folder and os.path.exists(os.path.join(save_folder, save_path)):
-        #     continue
+        if save_folder and os.path.exists(os.path.join(save_folder, save_path)):
+            continue
         data, _ = convert_3d(drawing, return_flag=True, threshold=50)
         im = draw_strokes(data, stroke_width=stroke_width, crop=True, square=True)
         if save_folder:
@@ -105,3 +104,32 @@ from tqdm import tqdm
 
 for json_path in tqdm(npy_files):
     draw_words(json_path, plot=False, stroke_width=np.random.randint(2, 8))
+
+# %%
+# ## sentence-level strokes
+def draw_sentences(
+    json_path, plot=False, save_folder="../data/calliar/sentences/", stroke_width=3, crop=True, square=True
+):
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+    drawing = json.load(open(json_path))
+    sentence = get_annotation(json_path)
+    save_path = json_path.split("/")[-1][:-5] + ".png"
+    # if save_folder and os.path.exists(os.path.join(save_folder, save_path)):
+    #     return
+    data, _ = convert_3d(drawing, return_flag=True, threshold=50)
+    im = draw_strokes(data, stroke_width=stroke_width, crop=True, square=True)
+    if save_folder:
+        im.save(os.path.join(save_folder, save_path))
+    if plot:
+        print(sentence)
+        display(im)
+
+
+draw_sentences(npy_files[-2], plot=True)
+
+# %%
+from tqdm import tqdm
+
+for json_path in tqdm(npy_files):
+    draw_sentences(json_path, plot=False, stroke_width=np.random.randint(2, 8))
