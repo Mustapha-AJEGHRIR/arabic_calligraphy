@@ -12,6 +12,13 @@ $ bash get_calliar.sh
 
 The script initialises the git submodules, updates it. Then extracts the dataset.
 
+To get images for individual characters, you can use the following command :
+
+```bash
+$ cd scripts
+$ python prepare_calliar.py
+```
+
 ### RuFa (Font recognition)
 
 Fonts: Aref Ruqaa - Iran Nastaliq
