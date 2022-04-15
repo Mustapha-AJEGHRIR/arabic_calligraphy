@@ -22,10 +22,9 @@ print(get_annotation(json_path))
 data, _ = convert_3d(drawing, return_flag=True, threshold=50)
 draw_strokes(data, stroke_width=8, crop=True, square=True)
 
-# %% [markdown]
-# ## Character-level strokes
 
 # %%
+# ## Character-level strokes
 def draw_chars(json_path, plot=False, save_folder="../data/calliar/chars/", stroke_width=3, crop=True, square=True):
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
@@ -36,7 +35,7 @@ def draw_chars(json_path, plot=False, save_folder="../data/calliar/chars/", stro
         if save_folder and os.path.exists(os.path.join(save_folder, save_path)):
             continue
         data, _ = convert_3d(drawing, return_flag=True, threshold=50)
-        im = draw_strokes(data, stroke_width=3, crop=True, square=True)
+        im = draw_strokes(data, stroke_width=stroke_width, crop=True, square=True)
         if save_folder:
             im.save(os.path.join(save_folder, save_path))
         if plot:
@@ -76,4 +75,33 @@ for i, file in enumerate(files):
     plt.title(label)
 plt.tight_layout()
 
+
 # %%
+# ## word-level strokes
+def draw_words(json_path, plot=False, save_folder="../data/calliar/words/", stroke_width=3, crop=True, square=True):
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+    word_drawings = generate_words(json_path)
+    print(json_path)
+    # print(word_drawings)
+    for i, d in enumerate(word_drawings):
+        word, drawing = list(d.items())[0]
+        save_path = json_path.split("/")[-1][:-5] + f"_{i}:{word}.png"
+        # if save_folder and os.path.exists(os.path.join(save_folder, save_path)):
+        #     continue
+        data, _ = convert_3d(drawing, return_flag=True, threshold=50)
+        im = draw_strokes(data, stroke_width=stroke_width, crop=True, square=True)
+        if save_folder:
+            im.save(os.path.join(save_folder, save_path))
+        if plot:
+            print(word)
+            display(im)
+
+
+draw_words(npy_files[-8], plot=True)
+
+# %%
+from tqdm import tqdm
+
+for json_path in tqdm(npy_files):
+    draw_words(json_path, plot=False, stroke_width=np.random.randint(2, 8))
