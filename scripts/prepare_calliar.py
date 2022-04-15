@@ -5,12 +5,11 @@ import io
 import glob
 import json
 import base64
-import os
-
 from utils.vis import *
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython.core.display import display, HTML, Video
+import os
 
 # %%
 dataset_path = "../Calliar/"
@@ -54,5 +53,27 @@ for json_path in tqdm(npy_files):
     draw_chars(json_path, plot=False, stroke_width=np.random.randint(2, 8))
 
 # %%
-# different stroke width
-# without cropping/square
+# plot a random sample of characters
+import glob
+import matplotlib.pyplot as plt
+
+plt.rcParams["figure.figsize"] = (7, 7)
+save_folder = "../data/calliar/chars/"
+# plot 5x5 images from save_folder
+files = glob.glob(os.path.join(save_folder, "*.png"))[:25]
+fig, ax = plt.subplots(5, 5, sharex=True, sharey=True, subplot_kw={"xticks": [], "yticks": []})
+ax = ax.flatten()
+for i, file in enumerate(files):
+    ax = plt.subplot(5, 5, i + 1)
+    for axis in ["top", "bottom", "left", "right"]:
+        ax.spines[axis].set_visible(True)
+        ax.spines[axis].set_linewidth(1)
+        ax.spines[axis].set_color("black")
+    plt.imshow(plt.imread(file))
+    # plt.axis("off")
+    # plot label
+    label = file.split("/")[-1].split(":")[-1][:-4]
+    plt.title(label)
+plt.tight_layout()
+
+# %%
