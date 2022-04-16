@@ -68,6 +68,8 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation_strategy", type=str, default="steps")
     parser.add_argument("--fp16", type=bool, default=True)
     parser.add_argument("--output_dir", type=str, default="./")
+    parser.add_argument("--limit_train", type=int, default=None)
+    parser.add_argument("--limit_eval", type=int, default=None)
 
     args = parser.parse_args()
 
@@ -85,12 +87,17 @@ if __name__ == "__main__":
     print(df.head())
 
     # split data
-    train_df, test_df = train_test_split(df, test_size=args.test_size, random_state=42)
-    # train_df, test_df = train_df[:], test_df[:100]
+    if args.test_size > 1:
+        args.test_size = int(args.test_size)
+    train_df, eval_df = train_test_split(df, test_size=args.test_size, random_state=42)
+    if args.limit_train is not None:
+        train_df = train_df[: args.limit_train]
+    if args.limit_eval is not None:
+        eval_df = eval_df[: args.limit_eval]
     train_df.reset_index(drop=True, inplace=True)
-    test_df.reset_index(drop=True, inplace=True)
+    eval_df.reset_index(drop=True, inplace=True)
     print(f"train_df: {train_df.shape}")
-    print(f"test_df: {test_df.shape}")
+    print(f"eval_df: {eval_df.shape}")
 
     # load feature extractors
 
@@ -106,7 +113,7 @@ if __name__ == "__main__":
 
     # load dataloaders
     train_dataset = IAMDataset(root_dir=args.data_path, df=train_df, processor=processor)
-    eval_dataset = IAMDataset(root_dir=args.data_path, df=test_df, processor=processor)
+    eval_dataset = IAMDataset(root_dir=args.data_path, df=eval_df, processor=processor)
     print("Number of training examples:", len(train_dataset))
     print("Number of validation examples:", len(eval_dataset))
 
