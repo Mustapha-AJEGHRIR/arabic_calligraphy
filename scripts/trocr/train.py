@@ -182,7 +182,7 @@ if __name__ == "__main__":
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=default_data_collator,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=250)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=args.early_stopping_patience)],
     )
     wandb.init(project="TrOCR", config=args)
 
