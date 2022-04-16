@@ -45,3 +45,6 @@ Execute the bash script as follows :
 $ cd data
 $ bash get_adab_dataset.sh    
 ```
+
+## Training
+### OCR
