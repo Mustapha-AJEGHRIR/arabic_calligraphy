@@ -167,7 +167,7 @@ if __name__ == "__main__":
         labels_ids[labels_ids == -100] = processor.tokenizer.pad_token_id
         label_str = processor.batch_decode(labels_ids, skip_special_tokens=True)
         cer = cer_metric.compute(predictions=pred_str, references=label_str)
-
+        print("predictions:", pred_str, "\tlabels:", label_str, "\tcer:", cer)
         return {"cer": cer}
 
     # instantiate trainer
