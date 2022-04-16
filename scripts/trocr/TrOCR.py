@@ -78,6 +78,8 @@ if __name__ == "__main__":
     else:
         df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
 
+    print(df.head())
+
     # split data
     train_df, test_df = train_test_split(df, test_size=args.test_size, random_state=42)
     # train_df, test_df = train_df[:], test_df[:100]
