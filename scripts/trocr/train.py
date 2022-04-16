@@ -177,7 +177,7 @@ if __name__ == "__main__":
         args=training_args,
         compute_metrics=compute_metrics,
         train_dataset=train_dataset,
-        eval_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         data_collator=default_data_collator,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=250)],
     )
