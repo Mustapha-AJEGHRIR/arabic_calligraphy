@@ -1,3 +1,4 @@
+#%%
 import pandas as pd
 import glob
 import os
@@ -33,7 +34,7 @@ class IAMDataset(Dataset):
 
 
 print("Loading data...")
-level = "words"
+level = "sentences"
 data_path = f"../../data/calliar/{level}/"
 images = glob.glob(os.path.join(data_path, "*"))
 df = pd.DataFrame(images, columns=["file_name"])
@@ -71,7 +72,10 @@ from transformers import VisionEncoderDecoderModel
 
 print("loading model...")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-1500", local_files_only=True)
+# model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-1500", local_files_only=True)
+model = VisionEncoderDecoderModel.from_pretrained(
+    "/usr/users/gpupro/gpu_ajeghrir/projects/arabic_calligraphy/scripts/trocr/checkpoint-500", local_files_only=True
+)
 model.to(device)
 
 # set special tokens used for creating the decoder_input_ids from the labels

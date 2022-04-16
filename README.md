@@ -16,7 +16,7 @@ To get images for individual characters, you can use the following command :
 
 ```bash
 cd scripts
-python prepare_calliar.py
+python3 prepare_calliar.py --level words
 ```
 
 ### RuFa (Font recognition)
@@ -51,5 +51,5 @@ bash get_adab_dataset.sh
 ### OCR
 
 ```bash
-python3 train.py --level words --test_size 0.1 --num_beams 4 --limit_eval 256 --per_device_train_batch_size 32 --per_device_eval_batch_size 16
+python3 train.py --level words --test_size 0.1 --num_beams 4 --limit_eval 256 --per_device_train_batch_size 32 --per_device_eval_batch_size 16 --gradient_accumulation_steps 2
 ```

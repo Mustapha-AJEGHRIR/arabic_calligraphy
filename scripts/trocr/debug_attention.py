@@ -3,11 +3,20 @@ import pandas as pd
 import glob
 import os
 
-data_path = "../data/calliar/chars/"
+
+print("Loading data...")
+level = "sentences"
+data_path = f"../../data/calliar/{level}/"
 images = glob.glob(os.path.join(data_path, "*"))
 df = pd.DataFrame(images, columns=["file_name"])
-df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
+if len(df) == 0:
+    raise ValueError("No images found in {}".format(data_path))
+if level == "sentences":
+    df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split("_")[0])
+else:
+    df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
 df
+
 
 # %%
 test_df = df
@@ -77,7 +86,10 @@ test_dataloader = DataLoader(test_dataset, batch_size=1)
 from transformers import VisionEncoderDecoderModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-2000", local_files_only=True)
+# model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-1500", local_files_only=True)
+model = VisionEncoderDecoderModel.from_pretrained(
+    "/usr/users/gpupro/gpu_ajeghrir/projects/arabic_calligraphy/scripts/trocr/checkpoint-500", local_files_only=True
+)
 model.to(device)
 
 # %%
