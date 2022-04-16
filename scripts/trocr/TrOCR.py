@@ -47,9 +47,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data_path",
         type=str,
-        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../data/calliar/chars/"),
+        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../data/calliar/"),
     )
-
+    parser.add_argument("--level", type=str, default="words", help="chars or words or sentences")
     parser.add_argument("--test_size", type=float, default=0.2)
     parser.add_argument("--per_device_train_batch_size", type=int, default=8)
     parser.add_argument("--per_device_eval_batch_size", type=int, default=8)
@@ -65,12 +65,18 @@ if __name__ == "__main__":
     parser.add_argument("--fp16", type=bool, default=True)
     parser.add_argument("--output_dir", type=str, default="./")
 
-    args = parser.parse_args()
+    args = parser.parse_args([])
 
     # load data
-    images = glob.glob(os.path.join(args.data_path, "*"))
+    data_path = os.path.join(args.data_path, args.level)
+    images = glob.glob(os.path.join(data_path, "*"))
+    if len(images) == 0:
+        raise ValueError("No images found in {}".format(data_path))
     df = pd.DataFrame(images, columns=["file_name"])
-    df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
+    if args.level == "sentences":
+        df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split("_")[0])
+    else:
+        df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
 
     # split data
     train_df, test_df = train_test_split(df, test_size=args.test_size, random_state=42)
