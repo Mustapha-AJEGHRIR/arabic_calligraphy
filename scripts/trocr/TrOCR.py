@@ -1,19 +1,23 @@
-import wandb
-import pandas as pd
+import argparse
 import glob
 import os
-from sklearn.model_selection import train_test_split
+
+import pandas as pd
 import torch
-from torch.utils.data import Dataset
-from PIL import Image
-from transformers import TrOCRProcessor
-from transformers import ViTFeatureExtractor
-from transformers import VisionEncoderDecoderModel
+import wandb
 from datasets import load_metric
-from transformers import default_data_collator
-from transformers import EarlyStoppingCallback
-from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
-import argparse
+from PIL import Image
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset
+from transformers import (
+    EarlyStoppingCallback,
+    Seq2SeqTrainer,
+    Seq2SeqTrainingArguments,
+    TrOCRProcessor,
+    VisionEncoderDecoderModel,
+    ViTFeatureExtractor,
+    default_data_collator,
+)
 
 
 class IAMDataset(Dataset):
@@ -65,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument("--fp16", type=bool, default=True)
     parser.add_argument("--output_dir", type=str, default="./")
 
-    args = parser.parse_args([])
+    args = parser.parse_args()
 
     # load data
     data_path = os.path.join(args.data_path, args.level)
