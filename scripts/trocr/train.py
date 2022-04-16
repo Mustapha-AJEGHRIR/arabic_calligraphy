@@ -72,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("--limit_train", type=int, default=None)
     parser.add_argument("--limit_eval", type=int, default=None)
     parser.add_argument("--num_beams", type=int, default=4)
+    parser.add_argument("--early_stopping_patience", type=int, default=200)
     args = parser.parse_args()
 
     # load data
