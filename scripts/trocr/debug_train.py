@@ -182,7 +182,7 @@ if __name__ == "__main__":
         data_collator=default_data_collator,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=250)],
     )
-    wandb.init(project="TrOCR")
+    wandb.init(project="TrOCR", config=args)
 
     trainer.train()
 
