@@ -55,6 +55,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--level", type=str, default="words", help="chars or words or sentences")
     parser.add_argument("--test_size", type=float, default=0.2)
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=2)
     parser.add_argument("--per_device_train_batch_size", type=int, default=8)
     parser.add_argument("--per_device_eval_batch_size", type=int, default=8)
     parser.add_argument("--num_train_epochs", type=int, default=500)
@@ -146,6 +147,7 @@ if __name__ == "__main__":
         evaluation_strategy=args.evaluation_strategy,
         per_device_train_batch_size=args.per_device_train_batch_size,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
         fp16=args.fp16,
         output_dir=args.output_dir,
         logging_steps=args.logging_steps,

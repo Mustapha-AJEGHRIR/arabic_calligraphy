@@ -51,5 +51,5 @@ bash get_adab_dataset.sh
 ### OCR
 
 ```bash
-python3 train.py --level words --test_size 0.1 --num_beams 4 --limit_eval 128
+python3 train.py --level words --test_size 0.1 --num_beams 4 --limit_eval 256 --per_device_train_batch_size 32 --per_device_eval_batch_size 16
 ```
