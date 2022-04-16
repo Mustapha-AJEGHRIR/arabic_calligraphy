@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument("--report_to", type=str, default="wandb")
     parser.add_argument("--load_best_model_at_end", type=bool, default=True)
     parser.add_argument("--logging_steps", type=int, default=1)
-    parser.add_argument("--save_steps", type=int, default=500)
+    parser.add_argument("--save_steps", type=int, default=11500)
     parser.add_argument("--save_total_limit", type=int, default=3)
     parser.add_argument("--eval_steps", type=int, default=5)
     parser.add_argument("--predict_with_generate", type=bool, default=True)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, default="./")
     parser.add_argument("--limit_train", type=int, default=None)
     parser.add_argument("--limit_eval", type=int, default=None)
-
+    parser.add_argument("--num_beams", type=int, default=4)
     args = parser.parse_args()
 
     # load data
@@ -136,10 +136,10 @@ if __name__ == "__main__":
     # set beam search parameters (comment to use greedy search)
     model.config.eos_token_id = processor.tokenizer.sep_token_id
     model.config.max_length = 64
-    # model.config.early_stopping = True
-    # model.config.no_repeat_ngram_size = 3
-    # model.config.length_penalty = 2.0
-    # model.config.num_beams = 4  # 4
+    model.config.early_stopping = True
+    model.config.no_repeat_ngram_size = 3
+    model.config.length_penalty = 2.0
+    model.config.num_beams = args.num_beams
 
     training_args = Seq2SeqTrainingArguments(
         predict_with_generate=args.predict_with_generate,
@@ -167,7 +167,8 @@ if __name__ == "__main__":
         labels_ids[labels_ids == -100] = processor.tokenizer.pad_token_id
         label_str = processor.batch_decode(labels_ids, skip_special_tokens=True)
         cer = cer_metric.compute(predictions=pred_str, references=label_str)
-        print("predictions:", pred_str, "\tlabels:", label_str, "\tcer:", cer)
+        print("predictions:", pred_str)
+        print("labels:", label_str)
         return {"cer": cer}
 
     # instantiate trainer
