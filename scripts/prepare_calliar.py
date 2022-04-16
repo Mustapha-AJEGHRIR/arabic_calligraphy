@@ -116,15 +116,17 @@ if __name__ == "__main__":
     # data, _ = convert_3d(drawing, return_flag=True, threshold=50)
     # draw_strokes(data, stroke_width=8, crop=True, square=True)
 
+    save_folder = os.path.join(args.save_folder, args.level)
+
     print(f"{len(npy_files)} files found in {os.path.join(args.dataset_path, 'dataset/train/**.json')}")
-    print(f"Saving to {os.path.join(args.save_folder, args.level)}")
+    print(f"Saving to {save_folder}")
 
     if args.level == "sentences":
         for json_path in tqdm(npy_files):
             draw_sentences(
                 json_path,
                 plot=args.plot,
-                save_folder=args.save_folder,
+                save_folder=save_folder,
                 stroke_width=np.random.randint(2, 8) if args.stroke_width == 0 else args.stroke_width,
                 crop=not args.no_crop,
                 square=not args.no_square,
@@ -134,7 +136,7 @@ if __name__ == "__main__":
             draw_words(
                 json_path,
                 plot=args.plot,
-                save_folder=args.save_folder,
+                save_folder=save_folder,
                 stroke_width=np.random.randint(2, 8) if args.stroke_width == 0 else args.stroke_width,
                 crop=not args.no_crop,
                 square=not args.no_square,
@@ -144,7 +146,7 @@ if __name__ == "__main__":
             draw_chars(
                 json_path,
                 plot=args.plot,
-                save_folder=args.save_folder,
+                save_folder=save_folder,
                 stroke_width=np.random.randint(2, 8) if args.stroke_width == 0 else args.stroke_width,
                 crop=not args.no_crop,
                 square=not args.no_square,
