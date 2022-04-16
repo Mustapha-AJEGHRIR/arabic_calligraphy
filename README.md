@@ -7,7 +7,7 @@
 Import the calliar repository into your project, by executing the bash script as follows :
 
 ```
-$ bash get_calliar.sh
+bash get_calliar.sh
 ```
 
 The script initialises the git submodules, updates it. Then extracts the dataset.
@@ -15,8 +15,8 @@ The script initialises the git submodules, updates it. Then extracts the dataset
 To get images for individual characters, you can use the following command :
 
 ```bash
-$ cd scripts
-$ python prepare_calliar.py
+cd scripts
+python prepare_calliar.py
 ```
 
 ### RuFa (Font recognition)
@@ -27,8 +27,8 @@ Fonts: Aref Ruqaa - Iran Nastaliq
 To get the data, execute the bash script as follows :
 
 ```bash
-$ cd data
-$ get_rufa_dataset.sh
+cd data
+get_rufa_dataset.sh
 ```
 
 ### KAFD (Font recognition)
@@ -42,9 +42,14 @@ Fonts: (40)
 Execute the bash script as follows :
 
 ```bash
-$ cd data
-$ bash get_adab_dataset.sh    
+cd data
+bash get_adab_dataset.sh    
 ```
 
 ## Training
+
 ### OCR
+
+```bash
+python3 train.py --level words --test_size 0.1 --num_beams 4
+```
