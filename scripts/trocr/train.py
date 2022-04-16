@@ -108,8 +108,12 @@ if __name__ == "__main__":
     # from transformers import RobertaTokenizer, XLMRobertaTokenizer
     # tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic") #TODO: https://github.com/huggingface/transformers/issues/2185
 
-    processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-    tokenizer = processor.tokenizer
+    # processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+    # tokenizer = processor.tokenizer
+    
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained("aubmindlab/bert-base-arabertv2")
+    
     feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
     processor = TrOCRProcessor(feature_extractor, tokenizer)
 
