@@ -1,22 +1,10 @@
-# %%
 import pandas as pd
 import glob
 import os
-
-data_path = "../data/calliar/chars/"
-images = glob.glob(os.path.join(data_path, "*"))[:5000]
-df = pd.DataFrame(images, columns=["file_name"])
-df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
-df
-
-# %%
-test_df = df
-print(f"test_df: {test_df.shape}")
-
-# %%
 import torch
 from torch.utils.data import Dataset
 from PIL import Image
+from sklearn.model_selection import train_test_split
 
 
 class IAMDataset(Dataset):
@@ -44,6 +32,19 @@ class IAMDataset(Dataset):
         return encoding
 
 
+print("Loading data...")
+level = "words"
+data_path = f"../../data/calliar/{level}/"
+images = glob.glob(os.path.join(data_path, "*"))
+df = pd.DataFrame(images, columns=["file_name"])
+if len(df) == 0:
+    raise ValueError("No images found in {}".format(data_path))
+if level == "sentences":
+    df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split("_")[0])
+else:
+    df["text"] = df["file_name"].apply(lambda x: x.split("/")[-1].split(":")[-1][:-4])  # ":" or "\uf03a"
+df
+
 # %%
 # from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 # processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
@@ -52,6 +53,7 @@ class IAMDataset(Dataset):
 
 from transformers import TrOCRProcessor
 
+print("loading processor...")
 processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
 tokenizer = processor.tokenizer
 from transformers import ViTFeatureExtractor
@@ -64,32 +66,14 @@ feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16
 # tokenizer = XLMRobertaTokenizer.from_pretrained("bhavikardeshna/xlm-roberta-base-arabic") #TODO: https://github.com/huggingface/transformers/issues/2185
 processor = TrOCRProcessor(feature_extractor, tokenizer)
 
-
-test_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
-
-# %%
-print("Number of test examples:", len(test_dataset))
-
-from torch.utils.data import DataLoader
-
-test_dataloader = DataLoader(test_dataset, batch_size=16)
-batch = next(iter(test_dataloader))
-for k, v in batch.items():
-    print(k, v.shape)
-
-labels = batch["labels"]
-labels[labels == -100] = processor.tokenizer.pad_token_id
-label_str = processor.batch_decode(labels, skip_special_tokens=True)
-print(label_str)
-
 # %%
 from transformers import VisionEncoderDecoderModel
 
+print("loading model...")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-2000", local_files_only=True)
+model = VisionEncoderDecoderModel.from_pretrained("./checkpoint-1500", local_files_only=True)
 model.to(device)
 
-# %%
 # set special tokens used for creating the decoder_input_ids from the labels
 model.config.decoder_start_token_id = processor.tokenizer.cls_token_id
 model.config.pad_token_id = processor.tokenizer.pad_token_id
@@ -102,8 +86,30 @@ model.config.max_length = 64
 model.config.early_stopping = True
 model.config.no_repeat_ngram_size = 3
 model.config.length_penalty = 2.0
-model.config.num_beams = 1  # 4
+model.config.num_beams = 4  # 4
 
+
+# %%
+print("train test split...")
+train_df, test_df = train_test_split(df, test_size=0.1, random_state=42)
+train_df.reset_index(drop=True, inplace=True)
+test_df.reset_index(drop=True, inplace=True)
+print(f"test_df: {test_df.shape}")
+test_dataset = IAMDataset(root_dir=data_path, df=test_df, processor=processor)
+
+print("Number of test examples:", len(test_dataset))
+
+from torch.utils.data import DataLoader
+
+test_dataloader = DataLoader(test_dataset, batch_size=32)
+batch = next(iter(test_dataloader))
+for k, v in batch.items():
+    print(k, v.shape)
+
+labels = batch["labels"]
+labels[labels == -100] = processor.tokenizer.pad_token_id
+label_str = processor.batch_decode(labels, skip_special_tokens=True)
+print(label_str)
 
 # %%
 from datasets import load_metric
@@ -137,7 +143,8 @@ for batch in tqdm(test_dataloader):
     label_true.extend(label_str)
     label_pred.extend(pred_str)
     cer.add_batch(predictions=pred_str, references=label_str)
-
+    print("pred_str:", pred_str)
+    print("label_str:", label_str)
 
 # save label_true and label_pred as csv
 df = pd.DataFrame({"label_true": label_true, "label_pred": label_pred})
@@ -145,7 +152,11 @@ df.to_csv("label_true_pred.csv", index=False)
 
 final_score = cer.compute()
 print("Character error rate on test set:", final_score)
+
+
 # %%
+#### plot confusion matrix for chars level
+
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
