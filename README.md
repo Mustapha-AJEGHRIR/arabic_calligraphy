@@ -1,8 +1,8 @@
 # arabic_calligraphy
 
 This repository contains code for 2 projects:
-    - **Arabic Calligraphy Style Recognition (ACSR)** : Detect the style of the arabic calligraphy, this work is deeply inspired by the work of [ARBML](https://github.com/ARBML/ARBML), a demo is available here : [HuggingFace space](https://huggingface.co/spaces/mustapha/ACSR)
-    - **Arabic Calligraaphy OCR** : recognize the text of the arabic calligraphy
+- **Arabic Calligraphy Style Recognition (ACSR)** : Detect the style of the arabic calligraphy, this work is deeply inspired by the work of [ARBML](https://github.com/ARBML/ARBML), a demo is available here : [HuggingFace space](https://huggingface.co/spaces/mustapha/ACSR)
+- **Arabic Calligraaphy OCR** : recognize the text of the arabic calligraphy
 
 ## Datasets
 
