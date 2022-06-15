@@ -1,4 +1,3 @@
-![Open in Colab](https://colab.research.google.com/drive/1kDVSHfZkKhh2UvmdcVs)
 # arabic_calligraphy
 
 This repository contains code for 2 projects:
